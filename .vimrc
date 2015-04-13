@@ -67,14 +67,34 @@ set cmdheight=1
 "keep cursor 5 lines above/below margins
 set scrolloff=5
 
+" put selection into braces
+" opening bracket for abc -> (abc)
+" closing bracket for abc ->
+" (
+" abc
+" )
+vnoremap <leader>{ <esc>`>a}<esc>`<i{<esc>
+vnoremap <leader>} <esc>`>o}<esc>`<O{<esc>
+vnoremap <leader>( <esc>`>a)<esc>`<i(<esc>
+vnoremap <leader>) <esc>`>o)<esc>`<O(<esc>
+vnoremap <leader>[ <esc>`>a]<esc>`<i[<esc>
+vnoremap <leader>] <esc>`>o]<esc>`<O[<esc>
+vnoremap <leader>$ <esc>`>a$<esc>`<i$<esc>
+vnoremap <leader>" <esc>`>a"<esc>`<i"<esc>
+
 " operator: inside $ ... $
 onoremap i$ :<c-u>normal! F$lvt$<cr>
 
-" map + key to compile tex documents with pdflatex
-autocmd BufEnter *.tex map + :w<enter>:!pdflatex %<.tex<enter><enter>
+"pdflatex shortcuts
+autocmd BufEnter *.tex noremap + :w<enter>:!pdflatex %<.tex<enter><enter>
+autocmd BufEnter *.tex inoremap <c-e> <esc>yyp:s/begin/end/<cr>kA
+autocmd BufEnter *.tex inoremap <c-i> \begin{itemize}<cr>\end{itemize}<esc>O\item<space>
+
 
 " map \pdf to open "current filname".pdf in evince
 nnoremap <silent> <leader>pdf :!evince %<.pdf & <cr><cr>
+" map \o to open file under cursor in evince
+:nnoremap \o "ayiW:!evince <C-r>a &<cr><cr>
 
 " R markdown specific
 " use custom Rmd syntax highlighting (see ~/.vim/syntax/rmd.vim)
