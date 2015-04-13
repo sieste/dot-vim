@@ -1,6 +1,6 @@
 "indenting
-set sts=4
-set shiftwidth=4
+set sts=2
+set shiftwidth=2
 set noautoindent
 set nocindent
 
