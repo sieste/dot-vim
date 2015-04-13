@@ -31,6 +31,11 @@ else
   colorscheme ron 
 endif
 
+" gui options (no menu bar, no toolbar, no right scrollbar)
+set guioptions-=m
+set guioptions-=T
+set guioptions-=r
+
 "enable syntax highlighting
 if !(exists('syntax_on'))
     syntax on
