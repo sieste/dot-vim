@@ -1,7 +1,11 @@
-nnoremap <silent> <leader>R :<c-u>call RR()<cr>
-vnoremap <silent> <leader>R :<c-u>call RR()<cr>
+" TODO: check for existence of R session with tmux list-sessions:
+" let test = system("tmux list-sessions") and go from there
 
-function! RR()
+
+nnoremap <silent> <leader>R :<c-u>call RR("n")<cr>
+vnoremap <silent> <leader>R :<c-u>call RR("v")<cr>
+
+function! RR(mode)
 
   " check if a tmux R session has been opened before
   if !exists("g:rsend_tmux_open")
@@ -14,16 +18,34 @@ function! RR()
     execute "redraw!"
   endif
 
-  " loop from first line ("'<") to last line ("'>") of selection
-  let l = line("'<")
-  while l <=# line("'>")
+  " in normalmode send current line to R
+  if a:mode ==# "n"
+    let firstline = line(".")
+    let lastline = firstline
+  endif
+  " in visual mode send all selected lines to R
+  if a:mode ==# "v"
+    let firstline = line("'<")
+    let lastline = line("'>'")
+  endif
 
-    " get current line, wrap in quotes, and attach $'\n'
+  " loop from first line ("'<") to last line ("'>") of selection
+  let l = firstline
+  while l <=# lastline
+
+    " get R command from current line
+    let Rcmd = getline(l)
+
+    " shell escape quotes
+    let Rcmd = substitute(Rcmd, '\"', '\\"', "g")
+    let Rcmd = substitute(Rcmd, "\'", "\\'", "g")
+
+    " wrap in quotes, and attach $'\n'
     " e.g. 1+1 becomes "1+1"$'\n'
-    let curline = "\"" . getline(l) . "\"$'\\n'"
+    let Rcmd = "\"" . Rcmd . "\"$'\\n'"
 
     " send to R session via tmux and redraw
-    silent execute "!tmux send-keys -t RSES " . curline
+    silent execute "!tmux send-keys -t RSES " . Rcmd
 
     " increment line number 
     let l = l+1
