@@ -36,22 +36,17 @@ function! RR(mode)
     " get R command from current line
     let Rcmd = getline(l)
 
-    " shell escape quotes
-    let Rcmd = substitute(Rcmd, '\"', '\\"', "g")
-    let Rcmd = substitute(Rcmd, "\'", "\\'", "g")
-
     " wrap in quotes, and attach $'\n'
     " e.g. 1+1 becomes "1+1"$'\n'
-    let Rcmd = "\"" . Rcmd . "\"$'\\n'"
-
-    " send to R session via tmux and redraw
-    silent execute "!tmux send-keys -t RSES " . Rcmd
+    " send to R session via tmux 
+    silent execute "!tmux send-keys -t RSES " . shellescape(Rcmd, 1) . "$'\\n'"
 
     " increment line number 
     let l = l+1
 
   endwhile
 
+  " redraw the screen
   execute "redraw!"
 
 endfunction
