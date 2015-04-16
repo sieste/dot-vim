@@ -1,16 +1,19 @@
-nnoremap <leader>g :<c-u>call DefAlign()<cr>
+nnoremap <leader>g :<c-u>call DefAlign("n")<cr>
+vnoremap <leader>g :<c-u>call DefAlign("v")<cr>
 
-" align variable definitions in current paragraph
-" using first `<-` as delimiter
-function! DefAlign()
+" align variable definitions in current paragraph or current selection using
+" first `<-` as delimiter
+function! DefAlign(mode)
   " save initial cursor position
   let pos_orig = getcurpos()
 
   " get delimiter from command line
   let delim = input("Enter delimiter: ", "<-")
 
-  " first and last line of current paragraph
-  execute "normal! mavip\<esc>`a"
+  " if in normal mode select current paragraph
+  if a:mode ==# "n"
+    execute "normal! mavip\<esc>`a"
+  endif
   let rowone = line("'<")
   let rowtwo = line("'>")
   
