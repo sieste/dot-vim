@@ -15,7 +15,7 @@ nnoremap <silent> <c-l> <c-l>:syn sync fromstart<cr>
 inoremap <silent> <c-l> <esc><c-l>:syn sync fromstart<cr>i
 
 "break lines without inserting newline character
-set linebreak
+set nolinebreak
 set wrap
 
 "splitting scheme, horz. split, maximized
@@ -100,7 +100,7 @@ nnoremap <silent> <leader>pdf :!evince %<.pdf & <cr><cr>
 " use custom Rmd syntax highlighting (see ~/.vim/syntax/rmd.vim)
 autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd set syntax=rmd
 " map + key to knit file and convert markdown to pdf with pandoc
-autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd map + :w<cr>:!Rscript -e 'library(knitr);knit("%")'<cr>:!pandoc %<.md -o %<.pdf --highlight-style=tango -V geometry:margin=1.5cm<cr>
+autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd map + :w<cr>:!Rscript -e 'knitr::knit("%")'<cr>:!/usr/local/bin/pandoc %<.md -o %<.pdf --highlight-style=tango -V geometry:margin=1.5cm<cr>
 
 " R specific
 " map + key to save and Rscript current file
@@ -110,7 +110,7 @@ autocmd BufNewFile,BufRead,BufEnter *.R,*.r,*.Rmd,*.rmd nnoremap = s<space><spac
 
 "markdown to pdf by pandoc
 autocmd BufNewFile,BufRead,BufEnter *.md set filetype=markdown
-autocmd BufNewFile,BufRead,BufEnter *.md map + :w<enter>:!pandoc % -o %<.pdf --toc-depth=1 -V geometry:margin=2cm --number-sections
+autocmd BufNewFile,BufRead,BufEnter *.md map + :w<enter>:!/usr/local/bin/pandoc % -o %<.pdf --toc-depth=1 -V geometry:margin=2cm --number-sections
 autocmd BufNewFile,BufRead,BufEnter *.md :syntax match markdownIgnore "\S_\S"
 
 " python specific 
