@@ -1,5 +1,6 @@
 " TODO: 
 " - R markdown mode
+" - write documentation
 
 
 nnoremap <silent> <leader>R :<c-u>call RR("n")<cr>
