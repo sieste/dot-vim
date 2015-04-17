@@ -1,5 +1,4 @@
 " TODO: 
-" - R markdown mode
 " - write documentation
 
 
@@ -12,12 +11,25 @@ vnoremap <silent> <leader>R :<c-u>call RR("v")<cr>
 " FUNCTION: SEND_TMUX
 " send the string 'Rcmd' (followed by return) to tmux session named 'session'
 function! s:send_tmux(Rcmd, session)
+
+  " make local copy of argument Rcmd 
+  let Rcmd = a:Rcmd
+
+  " remove leading whitespace from Rcmd
+  let Rcmd = substitute(Rcmd, "^ *", "", "")
+  
+  " for Rmarkdown/knitr compatibility:
+  " if Rcmd starts with ```, add # in front of it
+  if match(Rcmd, "```") ==# 0
+    let Rcmd = "# " . Rcmd
+  endif
+
   " shell-escape the command;
   " wrap in quotes; 
   " attach $'\n';
   " e.g. 1+1 becomes "1+1"$'\n'
   " send this to R session via tmux 
-  silent execute "!tmux send-keys -t " . a:session . " " . shellescape(a:Rcmd, 1) . "$'\\n'"
+  silent execute "!tmux send-keys -t " . a:session . " " . shellescape(Rcmd, 1) . "$'\\n'"
 endfunction
 
 
