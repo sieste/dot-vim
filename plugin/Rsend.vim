@@ -40,11 +40,12 @@ function! RR(mode)
   " check if the corresponding named tmux session is currently opened " by
   " testing if the return value of tmux... | grep... is non-empty; 
   " if empty, start new tmux session with R
-  let tmux_open = system("tmux list-sessions | grep " . g:r_session_name)
+  let tmux_open = system("tmux list-sessions 2>/dev/null | grep " . g:r_session_name)
   if empty(tmux_open)
     " open new urxvt terminal, start new tmux session with a unique name,
     " and execute R --no-save in background
     silent execute "!urxvt -e tmux new-session -s " . g:r_session_name . " 'R --no-save' &"
+    sleep 1
     execute "redraw!"
   endif
 
