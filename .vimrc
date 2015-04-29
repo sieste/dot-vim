@@ -44,6 +44,9 @@ endif
 "tab completion
 set wildmode=list:full
 
+" allow backspace to delete everything
+set backspace=indent,eol,start
+
 " status line
 highlight StatusLine ctermbg=black ctermfg=red 
 
