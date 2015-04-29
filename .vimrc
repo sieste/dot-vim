@@ -108,7 +108,7 @@ nnoremap <silent> <leader>pdf :!evince %<.pdf & <cr><cr>
 " use custom Rmd syntax highlighting (see ~/.vim/syntax/rmd.vim)
 autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd set syntax=rmd
 " map + key to knit file and convert markdown to pdf with pandoc
-autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd nnoremap + :w<cr>:!Rscript -e 'knitr::knit("%")'<cr>:!/usr/local/bin/pandoc %<.md -o %<.pdf --highlight-style=tango -V geometry:margin=1.5cm<cr><cr>
+autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd nnoremap + :w<cr>:!Rscript -e 'knitr::knit("%")'<cr>:!/usr/local/bin/pandoc %<.md -o %<.pdf --highlight-style=tango -V geometry:margin=2cm -V fontsize=12pt<cr><cr>
 autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd nnoremap <silent> <leader>+ :w<cr>:!Rscript -e 'knitr::purl("%")'<cr>:sp %<.R<cr>:setlocal autoread<cr>:set readonly<cr>
 
 " R specific
