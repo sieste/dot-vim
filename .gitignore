@@ -1,2 +1,7 @@
 spell
 .*.swp
+.netrwhist
+doc/tags
+.VimballRecord
+spell
+
