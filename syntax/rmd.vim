@@ -9,6 +9,8 @@ highlight default link RmdCaption Todo
 
 " blue math
 syntax region RmdMath start=/\$\+/ end=/\$\+/
+syntax region RmdMath start=/^\\begin{equation.*$/ end=/^\\end{equation.*$/
+syntax region RmdMath start=/^\\begin{align.*$/ end=/^\\end{align.*$/
 highlight default link RmdMath Comment
 
 " R syntax code blocks
