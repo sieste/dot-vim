@@ -15,7 +15,7 @@ function! s:send_tmux(Rcmd, session)
   " make local copy of argument Rcmd 
   let Rcmd = a:Rcmd
 
-  " remove leading whitespace from Rcmd
+  " remove leading whitespace from Rcmd 
   let Rcmd = substitute(Rcmd, "^ *", "", "")
   
   " for Rmarkdown/knitr compatibility:
@@ -24,14 +24,16 @@ function! s:send_tmux(Rcmd, session)
     let Rcmd = "# " . Rcmd
   endif
 
+  " appending a single whitespace fixes the bug due to lines starting with `-`
+  let Rcmd = " " . Rcmd
+
   " shell-escape the command;
   " wrap in quotes; 
   " attach $'\n';
   " e.g. 1+1 becomes "1+1"$'\n'
   " send this to R session via tmux 
-  silent execute "!tmux send-keys -t " . a:session . " " . shellescape(Rcmd, 1) . "$'\\n'"
+  silent execute "!tmux send-keys -t " . a:session . " " . shellescape(Rcmd, 1) . " Enter"
 endfunction
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
@@ -39,6 +41,7 @@ endfunction
 " function to send the current selection or current line to an
 " R session in a separate urxvt window
 function! RR(mode)
+
 
   """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
   " check if a tmux R session has been opened before by testing " if the global
@@ -58,6 +61,7 @@ function! RR(mode)
     " and execute R --no-save in background
     silent execute "!urxvt -e tmux new-session -s " . g:r_session_name . " 'R --no-save' &"
     sleep 1
+    silent execute "!tmux set-option status-right 'R session'"
     execute "redraw!"
   endif
 
@@ -73,6 +77,7 @@ function! RR(mode)
   """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
   " in visual mode:
   if a:mode ==# "v"
+
     " get line and column of start and end of selection
     let [firstline, firstcol] = getpos("'<")[1:2]
     let [lastline, lastcol] = getpos("'>")[1:2]
@@ -107,11 +112,16 @@ function! RR(mode)
         let l = l+1
       endwhile
     endif
+
+    " set cursor position to last line of selection
+    call cursor(getpos("'>")[1], 0)
+
   endif
 
   """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
   " redraw the screen
   execute "redraw!"
+
 
 endfunction
 
