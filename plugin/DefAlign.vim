@@ -2,13 +2,13 @@ nnoremap <leader>g :<c-u>call DefAlign("n")<cr>
 vnoremap <leader>g :<c-u>call DefAlign("v")<cr>
 
 " align variable definitions in current paragraph or current selection using
-" first `<-` as delimiter
+" first `=` as delimiter
 function! DefAlign(mode)
   " save initial cursor position
   let pos_orig = getcurpos()
 
   " get delimiter from command line
-  let delim = input("Enter delimiter: ", "<-")
+  let delim = input("Enter delimiter: ", "=")
 
   " if in normal mode select current paragraph
   if a:mode ==# "n"
