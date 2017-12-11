@@ -4,6 +4,9 @@ set shiftwidth=2
 set noautoindent
 set nocindent
 
+" spaces
+set nojoinspaces
+
 " longer history
 set history=1000
 
@@ -95,9 +98,10 @@ onoremap i$ :<c-u>normal! F$lvt$<cr>
 
 "pdflatex shortcuts
 autocmd BufEnter *.tex noremap + :w<enter>:!pdflatex %<.tex<enter><enter>
-autocmd BufEnter *.tex inoremap <c-e> <esc>yyp:s/begin/end/<cr>kA
-autocmd BufEnter *.tex inoremap <c-i> \begin{itemize}<cr>\end{itemize}<esc>O\item<space>
 
+"latex shortcuts
+autocmd BufEnter *.tex noremap - :w<enter>:!latex %<.tex & dvipdf %<.dvi<enter><enter>
+autocmd BufEnter *.tex nnoremap <leader>end <esc>yyp0lcwend<esc>O
 
 " map \pdf to open "current filname".pdf in evince
 nnoremap <silent> <leader>pdf :!evince %<.pdf & <cr><cr>
@@ -108,8 +112,9 @@ nnoremap <silent> <leader>pdf :!evince %<.pdf & <cr><cr>
 " use custom Rmd syntax highlighting (see ~/.vim/syntax/rmd.vim)
 autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd set syntax=rmd
 " map + key to knit file and convert markdown to pdf with pandoc
-autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd nnoremap + :w<cr>:!Rscript -e 'knitr::knit("%")'<cr>:!/usr/local/bin/pandoc %<.md -o %<.pdf --highlight-style=tango -V geometry:margin=2cm -V fontsize=12pt<cr><cr>
+autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd nnoremap + :w<cr>:!Rscript -e 'knitr::knit("%")'<cr>:!pandoc %<.md -o %<.pdf --highlight-style=tango -V geometry:margin=2cm -V fontsize=12pt<cr><cr>
 autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd nnoremap <silent> <leader>+ :w<cr>:!Rscript -e 'knitr::purl("%")'<cr>:sp %<.R<cr>:setlocal autoread<cr>:set readonly<cr>
+
 
 " R specific
 " map + key to save and Rscript current file
@@ -120,7 +125,7 @@ autocmd BufNewFile,BufRead,BufEnter *.R,*.r,*.Rmd,*.rmd nnoremap = s<space><spac
 
 "markdown to pdf by pandoc
 autocmd BufNewFile,BufRead,BufEnter *.md set filetype=markdown
-autocmd BufNewFile,BufRead,BufEnter *.md nnoremap + :w<enter>:!/usr/local/bin/pandoc % -o %<.pdf --toc-depth=1 -V geometry:margin=2cm --number-sections
+autocmd BufNewFile,BufRead,BufEnter *.md nnoremap + :w<enter>:!pandoc % -o %<.pdf --toc-depth=1 -V geometry:margin=2cm --number-sections
 autocmd BufNewFile,BufRead,BufEnter *.md :syntax match markdownIgnore "\S_\S"
 
 " python specific 
@@ -136,7 +141,7 @@ autocmd BufNewFile,BufRead,BufEnter Makefile set sw=0
 autocmd BufNewFile,BufRead,BufEnter Makefile set ts=4
 
 "change to directory of current file automatically
-autocmd BufEnter * lcd %:p:h
+"autocmd BufEnter * lcd %:p:h
 
 " edit vimrc 
 nnoremap <leader>ev :vsplit $MYVIMRC<cr>
@@ -144,4 +149,6 @@ nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 
 
+" gvim settings
+set guifont=Source\ Code\ Pro\ Light\ 16
 
