@@ -30,6 +30,7 @@ autocmd BufEnter * resize
 "colors
 if has('gui_running')
   colorscheme default
+  set background=light
 else
   colorscheme ron 
 endif
@@ -96,6 +97,13 @@ vnoremap <leader>" <esc>`>a"<esc>`<i"<esc>
 " operator: inside $ ... $
 onoremap i$ :<c-u>normal! F$lvt$<cr>
 
+" copy and paste using system clipboard
+nnoremap <leader>y "*yy
+vnoremap <leader>y "*y
+nnoremap <leader>p "*p
+vnoremap <leader>p "*p
+
+
 "pdflatex shortcuts
 autocmd BufEnter *.tex noremap + :w<enter>:!pdflatex %<.tex<enter><enter>
 
@@ -103,8 +111,8 @@ autocmd BufEnter *.tex noremap + :w<enter>:!pdflatex %<.tex<enter><enter>
 autocmd BufEnter *.tex noremap - :w<enter>:!latex %<.tex & dvipdf %<.dvi<enter><enter>
 autocmd BufEnter *.tex nnoremap <leader>end <esc>yyp0lcwend<esc>O
 
-" map \pdf to open "current filname".pdf in evince
-nnoremap <silent> <leader>pdf :!evince %<.pdf & <cr><cr>
+" map \PDF to open "current filname".pdf in evince
+nnoremap <silent> <leader>PDF :!evince %<.pdf & <cr><cr>
 " map \o to open file under cursor in evince
 :nnoremap \o "ayiW:!evince <C-r>a &<cr><cr>
 
