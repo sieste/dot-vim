@@ -28,17 +28,16 @@ nnoremap <C-k> <C-w>k
 autocmd BufEnter * resize
 
 "colors
-if has('gui_running')
-  colorscheme default
-  set background=light
-else
-  colorscheme ron 
-endif
+colorscheme solarized
+set background=dark
 
 " gui options (no menu bar, no toolbar, no right scrollbar)
 set guioptions-=m
 set guioptions-=T
 set guioptions-=r
+
+" line numbers
+set number
 
 "enable syntax highlighting
 if !(exists('syntax_on'))
@@ -158,5 +157,5 @@ nnoremap <leader>sv :source $MYVIMRC<cr>
 
 
 " gvim settings
-set guifont=Source\ Code\ Pro\ Light\ 16
+set guifont=Source\ Code\ Pro\ Light\ 18
 
