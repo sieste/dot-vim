@@ -39,6 +39,9 @@ set guioptions-=r
 " line numbers
 set number
 
+" make sure filetype plugins are loaded
+filetype plugin on
+
 "enable syntax highlighting
 if !(exists('syntax_on'))
     syntax on
@@ -103,17 +106,11 @@ nnoremap <leader>p "*p
 vnoremap <leader>p "*p
 
 
-"pdflatex shortcuts
-autocmd BufEnter *.tex noremap + :w<enter>:!pdflatex %<.tex<enter><enter>
-
-"latex shortcuts
-autocmd BufEnter *.tex noremap - :w<enter>:!latex %<.tex & dvipdf %<.dvi<enter><enter>
-autocmd BufEnter *.tex nnoremap <leader>end <esc>yyp0lcwend<esc>O
 
 " map \PDF to open "current filname".pdf in evince
 nnoremap <silent> <leader>PDF :!evince %<.pdf & <cr><cr>
 " map \o to open file under cursor in evince
-:nnoremap \o "ayiW:!evince <C-r>a &<cr><cr>
+nnoremap \o "ayiW:!evince <C-r>a &<cr><cr>
 
 " R markdown specific
 " use custom Rmd syntax highlighting (see ~/.vim/syntax/rmd.vim)
@@ -125,7 +122,7 @@ autocmd BufNewFile,BufRead,BufEnter *.Rmd,*.rmd nnoremap <silent> <leader>+ :w<c
 
 " R specific
 " map + key to save and Rscript current file
-autocmd BufNewFile,BufRead,BufEnter *.R,*.r nnoremap + :w<cr>:!Rscript %<cr>
+" autocmd BufNewFile,BufRead,BufEnter *.R,*.r nnoremap + :w<cr>:!Rscript %<cr>
 " map = key to turn "a=b" into "a = b"
 autocmd BufNewFile,BufRead,BufEnter *.R,*.r,*.Rmd,*.rmd nnoremap = s<space><space><esc>P
 
