@@ -1,127 +1,50 @@
-" TODO: 
-" - write documentation
+" send current line or selected text to a tmux pane that is running R
 
+nnoremap <silent> <leader>R :<c-u>call R_send('n')<cr>
+vnoremap <silent> <leader>R :<c-u>call R_send('v')<cr>
 
-nnoremap <silent> <leader>R :<c-u>call RR("n")<cr>
-vnoremap <silent> <leader>R :<c-u>call RR("v")<cr>
+function! R_send(mode)
 
+  let panes = split(system('tmux list-panes -F "#{pane_index} #{pane_current_command}"'), '\n')
+  let r_pane = matchstr(panes, 'R$')
+  if empty(r_pane)
+    echo "No R pane found in current window ..."
+  else
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
-" FUNCTION: SEND_TMUX
-" send the string 'Rcmd' (followed by return) to tmux session named 'session'
-function! s:send_tmux(Rcmd, session)
+    let r_pane = split(r_pane, ' ')[0]
 
-  " make local copy of argument Rcmd 
-  let Rcmd = a:Rcmd
-
-  " remove leading whitespace from Rcmd 
-  let Rcmd = substitute(Rcmd, "^ *", "", "")
-  
-  " for Rmarkdown/knitr compatibility:
-  " if Rcmd starts with ```, add # in front of it
-  if match(Rcmd, "```") ==# 0
-    let Rcmd = "# " . Rcmd
-  endif
-
-  " appending a single whitespace fixes the bug due to lines starting with `-`
-  let Rcmd = " " . Rcmd
-
-  " shell-escape the command;
-  " wrap in quotes; 
-  " attach $'\n';
-  " e.g. 1+1 becomes "1+1"$'\n'
-  " send this to R session via tmux 
-  silent execute "!tmux send-keys -t " . a:session . " " . shellescape(Rcmd, 1) . " Enter"
-endfunction
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
-" FUNCTION: RR
-" function to send the current selection or current line to an
-" R session in a separate urxvt window
-function! RR(mode)
-
-
-  """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
-  " check if a tmux R session has been opened before by testing " if the global
-  " variable r_session_name exists; otherwise set it using a random number
-  if !exists("g:r_session_name")
-    let rnd = split(system("echo $RANDOM"), '\v\n')[0]
-    let g:r_session_name = "R_" . rnd
-  endif
-
-  """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
-  " check if the corresponding named tmux session is currently opened " by
-  " testing if the return value of tmux... | grep... is non-empty; 
-  " if empty, start new tmux session with R
-  let tmux_open = system("tmux list-sessions 2>/dev/null | grep " . g:r_session_name)
-  if empty(tmux_open)
-    " open new urxvt terminal, start new tmux session with a unique name,
-    " and execute R --no-save in background
-    silent execute "!urxvt -e tmux new-session -s " . g:r_session_name . " 'R --no-save' &"
-    sleep 1
-    silent execute "!tmux set-option status-right 'R session'"
-    execute "redraw!"
-  endif
-
-  """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
-  " check for mode ...
-  " in normalmode: 
-  if a:mode ==# "n"
-    " send just the current line to R
-    let Rcmd = getline(".")
-    call s:send_tmux(Rcmd, g:r_session_name)
-  endif
-
-  """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
-  " in visual mode:
-  if a:mode ==# "v"
-
-    " get line and column of start and end of selection
-    let [firstline, firstcol] = getpos("'<")[1:2]
-    let [lastline, lastcol] = getpos("'>")[1:2]
-  
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
-    " only one line selected?
-    if firstline ==# lastline
-      let Rcmd = getline(firstline)[firstcol-1 : lastcol-1]
-      call s:send_tmux(Rcmd, g:r_session_name)
-
-    " or multiple lines selected?
-    else
-      " loop from firstline to lastline 
-      let l = firstline
-      while l <=# lastline
+    if a:mode ==# "n"
+      let r_cmd = [getline(".")] " in normal mode use the current line
+    endif
     
-        " read entire current line
-        let Rcmd = getline(l)
-        " cut off beginning of first line
-        if l ==# firstline 
-          let Rcmd = Rcmd[firstcol - 1 :]
-        endif
-        " cut off end of last line
-        if l ==# lastline
-          let Rcmd = Rcmd[: lastcol - 1]
-        endif
-
-        " execute 
-        call s:send_tmux(Rcmd, g:r_session_name)
-    
-        " increment line number 
-        let l = l+1
-      endwhile
+    if a:mode ==# "v" " in visual mode use the selected text
+      let [firstline, firstcol] = getpos("'<")[1:2]
+      let [lastline, lastcol] = getpos("'>")[1:2]
+      let r_cmd = getline(firstline, lastline)
+      let r_cmd[-1] = r_cmd[-1][ : lastcol-(&selection == 'inclusive' ? 1 : 2)]
+      let r_cmd[0] = r_cmd[0][firstcol-1 : ]                
+      call cursor(getpos("'>")[1], 0) " set cursor position to last line of selection
     endif
 
-    " set cursor position to last line of selection
-    call cursor(getpos("'>")[1], 0)
+    " apply any special rules here
+    let ii = 0
+    while (ii < len(r_cmd))
+      let r_cmd[ii] = substitute(r_cmd[ii], '^```', '# ```', '')
+      let ii += 1
+    endwhile
+    
+    " send commands to R pane
+    let tmux_cmd_prefix = 'tmux send-keys -t ' . r_pane . ' -l -- '
+    let tmux_enter = 'tmux send-keys -t ' . r_pane . ' Enter'
+    call system('tmux send-keys -t ' . r_pane . ' C-u') " delete current line
+    for r_cmd_i in r_cmd
+      call system(tmux_cmd_prefix . shellescape(r_cmd_i))
+      call system(tmux_enter)
+    endfor
 
   endif
 
-  """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'
-  " redraw the screen
-  execute "redraw!"
-
-
 endfunction
+
+
 
